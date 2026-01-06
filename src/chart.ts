@@ -10,6 +10,7 @@ export function initDiagram(divId: string, nodeDataArray: NodeData[], linkDataAr
 
     const myDiagram = $(go.Diagram, divId, {
         "undoManager.isEnabled": true,
+        "linkingTool.isEnabled": false, // Disable drawing new links to restore node dragging
         // (a) Bright Grey Grid
         "grid.visible": true,
         grid: $(go.Panel, "Grid",
@@ -105,7 +106,11 @@ export function initDiagram(divId: string, nodeDataArray: NodeData[], linkDataAr
     // Default Template (Employees)
     myDiagram.nodeTemplateMap.add("Employee",
         $(go.Node, "Auto",
-            { contextMenu: partContextMenu },
+            {
+                contextMenu: partContextMenu,
+                fromLinkable: true,
+                toLinkable: true
+            },
             $(go.Shape, "RoundedRectangle", { name: "SHAPE", fill: "white", stroke: "#888", strokeWidth: 1 }),
             $(go.Panel, "Vertical", { margin: 8 },
                 $(go.TextBlock, { font: "bold 12pt sans-serif", stroke: "#333", margin: 2, editable: true }, new go.Binding("text", "title")),
@@ -118,7 +123,11 @@ export function initDiagram(divId: string, nodeDataArray: NodeData[], linkDataAr
     // Board Template (Directors) - Different Color
     myDiagram.nodeTemplateMap.add("Board",
         $(go.Node, "Auto",
-            { contextMenu: partContextMenu },
+            {
+                contextMenu: partContextMenu,
+                fromLinkable: true,
+                toLinkable: true
+            },
             $(go.Shape, "RoundedRectangle", { name: "SHAPE", fill: "#e1f5fe", stroke: "#0277bd", strokeWidth: 2 }),
             $(go.Panel, "Vertical", { margin: 8 },
                 $(go.TextBlock, { font: "bold 12pt sans-serif", stroke: "#01579b", margin: 2, editable: true }, new go.Binding("text", "title")),
