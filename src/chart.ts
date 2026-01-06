@@ -17,6 +17,7 @@ export function initDiagram(divId: string, nodeDataArray: NodeData[], linkDataAr
             $(go.Shape, "LineV", { stroke: "#F5F5F5", strokeWidth: 1 })
         ),
         layout: $(go.TreeLayout, {
+            isOngoing: false, // STOP auto-layout when adding links
             angle: 90,
             layerSpacing: 50,
             nodeSpacing: 50,
