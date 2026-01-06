@@ -10,6 +10,12 @@ export function initDiagram(divId: string, nodeDataArray: NodeData[], linkDataAr
 
     const myDiagram = $(go.Diagram, divId, {
         "undoManager.isEnabled": true,
+        // (a) Bright Grey Grid
+        "grid.visible": true,
+        grid: $(go.Panel, "Grid",
+            $(go.Shape, "LineH", { stroke: "#F5F5F5", strokeWidth: 1 }),
+            $(go.Shape, "LineV", { stroke: "#F5F5F5", strokeWidth: 1 })
+        ),
         layout: $(go.TreeLayout, {
             angle: 90,
             layerSpacing: 50,
@@ -31,7 +37,7 @@ export function initDiagram(divId: string, nodeDataArray: NodeData[], linkDataAr
         );
     }
 
-    // The Context Menu Object
+    // The Context Menu Object (Nodes)
     const partContextMenu =
         $("ContextMenu",
             makeButton("Change Color",
@@ -61,6 +67,35 @@ export function initDiagram(divId: string, nodeDataArray: NodeData[], linkDataAr
                     if (node === null) return;
                     const data = node.data as NodeData;
                     alert("Details:\nName: " + data.name + "\nRole: " + data.title + "\nID: " + data.key);
+                }
+            ),
+            makeButton("Delete Node",
+                function (e, obj) {
+                    const button = obj as go.GraphObject;
+                    const ad = button.part as go.Adornment;
+                    const part = ad.adornedPart;
+                    if (part !== null) {
+                        e.diagram.startTransaction("Delete Node");
+                        e.diagram.remove(part);
+                        e.diagram.commitTransaction("Delete Node");
+                    }
+                }
+            )
+        );
+
+    // Context Menu for Links
+    const linkContextMenu =
+        $("ContextMenu",
+            makeButton("Delete Link",
+                function (e, obj) {
+                    const button = obj as go.GraphObject;
+                    const ad = button.part as go.Adornment;
+                    const part = ad.adornedPart;
+                    if (part !== null) {
+                        e.diagram.startTransaction("Delete Link");
+                        e.diagram.remove(part);
+                        e.diagram.commitTransaction("Delete Link");
+                    }
                 }
             )
         );
@@ -98,7 +133,13 @@ export function initDiagram(divId: string, nodeDataArray: NodeData[], linkDataAr
     // Standard Hierarchy: ORTHOGONAL
     myDiagram.linkTemplate =
         $(go.Link,
-            { routing: go.Link.Orthogonal, corner: 5 },
+            {
+                routing: go.Link.Orthogonal,
+                corner: 5,
+                relinkableFrom: true,
+                relinkableTo: true,
+                contextMenu: linkContextMenu
+            },
             $(go.Shape, { strokeWidth: 2, stroke: "#444" }),
             $(go.Shape, { toArrow: "Standard", stroke: null, fill: "#444" })
         );
@@ -106,7 +147,13 @@ export function initDiagram(divId: string, nodeDataArray: NodeData[], linkDataAr
     // Reporting Lines: BEZIER (Curved & Dotted)
     myDiagram.linkTemplateMap.add("Dotted",
         $(go.Link,
-            { curve: go.Link.Bezier, curviness: 40 },
+            {
+                curve: go.Link.Bezier,
+                curviness: 40,
+                relinkableFrom: true,
+                relinkableTo: true,
+                contextMenu: linkContextMenu
+            },
             $(go.Shape, { strokeWidth: 2, stroke: "#e53935", strokeDashArray: [6, 3] }),
             $(go.Shape, { toArrow: "OpenTriangle", stroke: "#e53935", strokeWidth: 2 })
         )
