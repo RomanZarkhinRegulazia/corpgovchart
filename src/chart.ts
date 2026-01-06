@@ -10,7 +10,6 @@ export function initDiagram(divId: string, nodeDataArray: NodeData[], linkDataAr
 
     const myDiagram = $(go.Diagram, divId, {
         "undoManager.isEnabled": true,
-        "linkingTool.isEnabled": false, // Disable drawing new links to restore node dragging
         // (a) Bright Grey Grid
         "grid.visible": true,
         grid: $(go.Panel, "Grid",
@@ -107,15 +106,32 @@ export function initDiagram(divId: string, nodeDataArray: NodeData[], linkDataAr
     myDiagram.nodeTemplateMap.add("Employee",
         $(go.Node, "Auto",
             {
-                contextMenu: partContextMenu,
-                fromLinkable: true,
-                toLinkable: true
+                contextMenu: partContextMenu
+                // linkable properties moved to Shape to avoid conflict
             },
-            $(go.Shape, "RoundedRectangle", { name: "SHAPE", fill: "white", stroke: "#888", strokeWidth: 1 }),
+            $(go.Shape, "RoundedRectangle",
+                {
+                    name: "SHAPE", fill: "white", stroke: "#888", strokeWidth: 1,
+                    portId: "",          // Default port
+                    toLinkable: true,    // Receive links
+                    fromLinkable: false  // No dragging links from body
+                }
+            ),
             $(go.Panel, "Vertical", { margin: 8 },
                 $(go.TextBlock, { font: "bold 12pt sans-serif", stroke: "#333", margin: 2, editable: true }, new go.Binding("text", "title")),
                 $(go.TextBlock, { font: "10pt sans-serif", stroke: "#555", editable: true }, new go.Binding("text", "name")),
-                $(go.TextBlock, { font: "8pt sans-serif", stroke: "#999", editable: true }, new go.Binding("text", "key"))
+                $(go.TextBlock, { font: "8pt sans-serif", stroke: "#999", editable: true }, new go.Binding("text", "key")),
+                // THE PORT (Link Handle)
+                $(go.Shape, "Circle",
+                    {
+                        width: 8, height: 8,
+                        fill: "#666", stroke: null,
+                        alignment: go.Spot.Bottom, // Place at bottom
+                        portId: "out",           // ID for the port
+                        fromLinkable: true,      // Allow dragging NEW links from here
+                        cursor: "pointer"        // Visual cue
+                    }
+                )
             )
         )
     );
@@ -124,15 +140,32 @@ export function initDiagram(divId: string, nodeDataArray: NodeData[], linkDataAr
     myDiagram.nodeTemplateMap.add("Board",
         $(go.Node, "Auto",
             {
-                contextMenu: partContextMenu,
-                fromLinkable: true,
-                toLinkable: true
+                contextMenu: partContextMenu
+                // linkable props moved
             },
-            $(go.Shape, "RoundedRectangle", { name: "SHAPE", fill: "#e1f5fe", stroke: "#0277bd", strokeWidth: 2 }),
+            $(go.Shape, "RoundedRectangle",
+                {
+                    name: "SHAPE", fill: "#e1f5fe", stroke: "#0277bd", strokeWidth: 2,
+                    portId: "",
+                    toLinkable: true,
+                    fromLinkable: false
+                }
+            ),
             $(go.Panel, "Vertical", { margin: 8 },
                 $(go.TextBlock, { font: "bold 12pt sans-serif", stroke: "#01579b", margin: 2, editable: true }, new go.Binding("text", "title")),
                 $(go.TextBlock, { font: "10pt sans-serif", stroke: "#0277bd", editable: true }, new go.Binding("text", "name")),
-                $(go.TextBlock, { font: "8pt sans-serif", stroke: "#0288d1", editable: true }, new go.Binding("text", "key"))
+                $(go.TextBlock, { font: "8pt sans-serif", stroke: "#0288d1", editable: true }, new go.Binding("text", "key")),
+                // THE PORT (Link Handle)
+                $(go.Shape, "Circle",
+                    {
+                        width: 8, height: 8,
+                        fill: "#0277bd", stroke: null,
+                        alignment: go.Spot.Bottom,
+                        portId: "out",
+                        fromLinkable: true,
+                        cursor: "pointer"
+                    }
+                )
             )
         )
     );
